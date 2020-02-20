@@ -356,30 +356,21 @@ ssh_gssapi_do_child(char ***envp, u_int *envsizep)
 
 /* Privileged */
 int
-ssh_gssapi_userok(char *user)
+ssh_gssapi_userok(gss_name_t name, char *user)
 {
 	OM_uint32 lmin;
+	int ret;
 
-	if (gssapi_client.exportedname.length == 0 ||
-	    gssapi_client.exportedname.value == NULL) {
-		debug("No suitable client data");
-		return 0;
+	ret = gss_userok(name, user);
+	if (!ret) {
+		/* Destroy delegated credentials if userok fails */
+		gss_release_buffer(&lmin, &gssapi_client.displayname);
+		gss_release_buffer(&lmin, &gssapi_client.exportedname);
+		gss_release_cred(&lmin, &gssapi_client.creds);
+		explicit_bzero(&gssapi_client, sizeof(ssh_gssapi_client));
+		debug("ssh_gssapi_userok: user unauthorized");
 	}
-	if (gssapi_client.mech && gssapi_client.mech->userok)
-		if ((*gssapi_client.mech->userok)(&gssapi_client, user))
-			return 1;
-		else {
-			/* Destroy delegated credentials if userok fails */
-			gss_release_buffer(&lmin, &gssapi_client.displayname);
-			gss_release_buffer(&lmin, &gssapi_client.exportedname);
-			gss_release_cred(&lmin, &gssapi_client.creds);
-			explicit_bzero(&gssapi_client,
-			    sizeof(ssh_gssapi_client));
-			return 0;
-		}
-	else
-		debug("ssh_gssapi_userok: Unknown GSSAPI mechanism");
-	return (0);
+	return (ret);
 }
 
 /* Privileged */

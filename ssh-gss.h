@@ -34,6 +34,10 @@
 #include <gssapi/gssapi.h>
 #endif
 
+#ifdef HAVE_GSSAPI_GSSAPI_EXT_H
+#include <gssapi/gssapi_ext.h>
+#endif
+
 #ifdef KRB5
 # ifndef HEIMDAL
 #  ifdef HAVE_GSSAPI_GENERIC_H
@@ -127,7 +131,7 @@ int ssh_gssapi_check_mechanism(Gssctxt **, gss_OID, const char *);
 
 /* In the server */
 OM_uint32 ssh_gssapi_server_ctx(Gssctxt **, gss_OID);
-int ssh_gssapi_userok(char *name);
+int ssh_gssapi_userok(gss_name_t name, char *user);
 OM_uint32 ssh_gssapi_checkmic(Gssctxt *, gss_buffer_t, gss_buffer_t);
 void ssh_gssapi_do_child(char ***, u_int *);
 void ssh_gssapi_cleanup_creds(void);

@@ -1904,7 +1904,8 @@ mm_answer_gss_userok(struct ssh *ssh, int sock, struct sshbuf *m)
 	if (!options.gss_authentication)
 		fatal("%s: GSSAPI authentication not enabled", __func__);
 
-	authenticated = authctxt->valid && ssh_gssapi_userok(authctxt->user);
+	authenticated = authctxt->valid &&
+		ssh_gssapi_userok(gsscontext->client, authctxt->user);
 
 	sshbuf_reset(m);
 	if ((r = sshbuf_put_u32(m, authenticated)) != 0)

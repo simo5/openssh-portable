@@ -246,6 +246,7 @@ static int
 input_gssapi_exchange_complete(int type, u_int32_t plen, struct ssh *ssh)
 {
 	Authctxt *authctxt = ssh->authctxt;
+	Gssctxt *gssctxt;
 	int r, authenticated;
 	const char *displayname;
 
@@ -260,7 +261,9 @@ input_gssapi_exchange_complete(int type, u_int32_t plen, struct ssh *ssh)
 	if ((r = sshpkt_get_end(ssh)) != 0)
 		fatal("%s: %s", __func__, ssh_err(r));
 
-	authenticated = PRIVSEP(ssh_gssapi_userok(authctxt->user));
+	gssctxt = authctxt->methoddata;
+	authenticated = PRIVSEP(ssh_gssapi_userok(gssctxt->client,
+						  authctxt->user));
 
 	if ((!use_privsep || mm_is_monitor()) &&
 	    (displayname = ssh_gssapi_displayname()) != NULL)
@@ -306,7 +309,8 @@ input_gssapi_mic(int type, u_int32_t plen, struct ssh *ssh)
 	gssbuf.length = sshbuf_len(b);
 
 	if (!GSS_ERROR(PRIVSEP(ssh_gssapi_checkmic(gssctxt, &gssbuf, &mic))))
-		authenticated = PRIVSEP(ssh_gssapi_userok(authctxt->user));
+		authenticated = PRIVSEP(ssh_gssapi_userok(gssctxt->client,
+							  authctxt->user));
 	else
 		logit("GSSAPI MIC check failed");
 
