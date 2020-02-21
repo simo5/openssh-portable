@@ -81,12 +81,8 @@ typedef struct {
 } ssh_gssapi_client;
 
 typedef struct ssh_gssapi_mech_struct {
-	char *enc_name;
 	char *name;
 	gss_OID_desc oid;
-	int (*dochild) (ssh_gssapi_client *);
-	int (*userok) (ssh_gssapi_client *, char *);
-	int (*localname) (ssh_gssapi_client *, char **);
 	void (*storecreds) (ssh_gssapi_client *);
 } ssh_gssapi_mech;
 

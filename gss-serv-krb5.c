@@ -163,12 +163,8 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
 }
 
 ssh_gssapi_mech gssapi_kerberos_mech = {
-	"toWM5Slw5Ew8Mqkay+al2g==",
 	"Kerberos",
 	{9, "\x2A\x86\x48\x86\xF7\x12\x01\x02\x02"},
-	NULL,
-	NULL,
-	NULL,
 	&ssh_gssapi_krb5_storecreds
 };
 
